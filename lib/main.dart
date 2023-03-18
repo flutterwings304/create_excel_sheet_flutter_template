@@ -1,5 +1,7 @@
+import 'package:create_excel_sheet_flutter_template/file_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xcel;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'constant.dart';
 
@@ -46,7 +48,17 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[],
+          children: List.generate(myList.length, (index) {
+            return Card(
+              child: ListTile(
+                onTap: (){
+                  launchUrl(Uri.parse(myList[index]["link"].toString()));
+                },
+                title: Text(myList[index]["title"].toString()),
+                subtitle:Text(myList[index]["link"].toString()) ,
+              ),
+            );
+          }),
         ),
       ),
       floatingActionButtonLocation:
@@ -65,8 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
             sheet.getRangeByIndex(i + 2, 1).setText(item["title"].toString());
             sheet.getRangeByIndex(i + 2, 2).setText(item["link"].toString());
           }
-          // final List<int> bytes = workbook.saveAsStream();
-          // workbook.saveAsCSV("mylist.csv");
+         
+          final List<int> bytes = workbook.saveAsStream();
+         FileStorage.writeCounter(bytes, "geeksforgeeks.xlsx", context);
           workbook.dispose();
         },
         label: const Text("Create Excel sheet"),
